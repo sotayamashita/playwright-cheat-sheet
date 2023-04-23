@@ -42,10 +42,12 @@ export default defineConfig({
       use: { ...devices['Desktop Firefox'] },
     },
 
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
+    // TODO: Fix missing dependency errors in GitHub Actions
+    // See: https://github.com/sotayamashita/playwright-cheat-sheet/actions/runs/4777805095/jobs/8493788876
+    // {
+    //   name: 'webkit',
+    //   use: { ...devices['Desktop Safari'] },
+    // },
 
     /* Test against mobile viewports. */
     // {
