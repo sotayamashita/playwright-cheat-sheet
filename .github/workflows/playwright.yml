@@ -1,0 +1,56 @@
+name: Playwright Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+  timeout-minutes: 60
+  runs-on: ubuntu-latest
+
+  steps:
+    - uses: actions/checkout@v3
+
+    - uses: actions/setup-node@v3
+      with:
+        node-version: lts/*
+        cache: 'npm'
+    
+    - run: npm ci
+
+
+    #
+    # Setup Playwright Browsers
+    #
+    - name: Get Playwright version
+      id: playwright-version
+      # Extract the package version by jq. 
+      run: |
+        PLAYWRIGHT_VERSION=$(npm ls @playwright/test --json | jq '.dependencies["@playwright/test"].version')
+        echo "PLAYWRIGHT_VERSION=${PLAYWRIGHT_VERSION}" >> $GITHUB_OUTPUT
+
+    - name: Setup Playwright Browsers cache for Playwright's Version
+      uses: actions/cache@v3
+      id: playwright-browsers-cache
+      with:
+          # The location of the browsers depends on the OS.
+          # See: https://playwright.dev/docs/ci#directories-to-cache
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-browsers-for-${{ steps.playwright-version.outputs.PLAYWRIGHT_VERSION }}
+        
+    - name: Install Playwright Browsers
+      if: steps.playwright-browsers-cache.outputs.cache-hit != 'true'
+      run: npx playwright install --with-deps
+
+
+    - run: npx playwright test
+
+    - uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
