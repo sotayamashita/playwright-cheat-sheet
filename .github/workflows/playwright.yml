@@ -29,7 +29,7 @@ jobs:
         id: playwright-version
         # Extract the package version by jq. 
         run: |
-          PLAYWRIGHT_VERSION=$(npm ls @playwright/test --json | jq '.dependencies["@playwright/test"].version')
+          PLAYWRIGHT_VERSION=$(npm ls @playwright/test --json | jq -r '.dependencies["@playwright/test"].version')
           echo "PLAYWRIGHT_VERSION=${PLAYWRIGHT_VERSION}" >> $GITHUB_OUTPUT
 
       - name: Setup Playwright Browsers cache for Playwright's Version
